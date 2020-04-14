@@ -76,6 +76,57 @@ def Mirroir(a,b):
             glVertex3fv (verticies[vertex])
     glEnd ()
 
+def support():
+    verticies1 = (
+        (-0.1 , -3 , -0.1) ,
+        (-0.1 , -3 , 0.1) ,
+        (0.1 , -3 , 0.1) ,
+        (0.1 , -3 , -0.1),
+        (-0.1 , 0 , -0.1) ,
+        (-0.1 , 0 , 0.1) ,
+        (0.1 , 0 , 0.1) ,
+        (0.1 , 0 , -0.1) ,
+
+
+    )
+    edges1 = (
+        (0 , 1) ,
+        (0 , 3) ,
+        (0 , 4) ,
+        (2 , 1) ,
+        (2 , 3) ,
+        (2 , 6) ,
+        (4 , 0) ,
+        (4 , 5) ,
+        (4 , 7) ,
+        (6 , 2) ,
+        (6 , 7) ,
+        (6 , 5)
+    )
+    surfaces = (
+        (0 , 1 , 2 , 3) ,
+        (1 , 2 , 4 , 5) ,
+        (5 , 4 , 7 , 6) ,
+        (6 , 7 , 3 , 0) ,
+        (0 , 7 , 4 , 1) ,
+        (6 , 5 , 2 , 3)
+    )
+
+    glBegin (GL_QUADS)
+    for surface in surfaces:
+        x = 0
+        for vertex in surface:
+            x += 1
+            glColor3fv (colors[x])
+            glVertex3fv (verticies1[vertex])
+    glEnd ()
+    glBegin (GL_LINES)
+    for edge1 in edges1:
+        for vertex in edge1:
+            glVertex3fv (verticies1[vertex])
+    glEnd ()
+
+
 def main():
 
 
@@ -148,6 +199,7 @@ def main():
         glPushMatrix ()
         Mirroir(a,b)
         glPopMatrix ()
+        support()
         pygame.display.flip ()
         pygame.time.wait (10)
 
