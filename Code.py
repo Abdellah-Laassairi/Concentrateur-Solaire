@@ -4,7 +4,7 @@ import imgui
 
 import pygame
 from pygame.locals import *
-
+from math import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -23,8 +23,7 @@ colors = (
     (0 , 1 , 1) ,
 )
 
-
-def Mirroir(a,b):
+def Mirroir(a,b,c):
     verticies = (
         (-2 , -1 , -0.1) ,
         (2 , -1 , -0.1) ,
@@ -56,13 +55,26 @@ def Mirroir(a,b):
         (5 , 4 , 7 , 6) ,
         (6 , 7 , 3 , 0) ,
         (0 , 7 , 4 , 1) ,
-        (6 , 5 , 2 , 3)
-    )
+        (6 , 5 , 2 , 3))
+#    x
+#    |
+#    |
+#    |
+#    |_ _ _ _ _ _ _z
+#   /
+#  /
+# /
+# y 
+
+
+    
     glRotate (-a , 0 , 1, 0)
     glRotate (-b , 1 ,0 , 0)
+    glTranslatef (0, 0  , 3)
+    glTranslatef (0, -3*(1-cos(3.14*c/180))  , -3*(1-sin(3.14*c/180)))
 
+    
     glBegin (GL_QUADS)
-
     for surface in surfaces:
         x = 0
         for vertex in surface:
@@ -76,7 +88,7 @@ def Mirroir(a,b):
             glVertex3fv (verticies[vertex])
     glEnd ()
 
-def support(c,d):
+def support(c):
     verticies1 = (
         (-0.1 , -3 , -0.1) ,
         (-0.1 , -3 , 0.1) ,
@@ -111,8 +123,10 @@ def support(c,d):
         (0 , 7 , 4 , 1) ,
         (6 , 5 , 2 , 3)
     )
-    glRotate (-c , 0, 1 , 0)
-    glRotate (-d , 0 ,0 , 1)
+    glRotate (180 , 0, 0 , 1)
+    glTranslatef (0 , 3 , 0)
+
+    glRotate (-c , 1 ,0 , 0)
     glBegin (GL_QUADS)
     for surface in surfaces:
         x = 0
@@ -185,6 +199,7 @@ def main():
     gluPerspective (45 , (display[0] / display[1]) , 0.1 , 50.0)
 
     glTranslatef (0 , 0 , -10)
+
     glRotatef (25 , 2 , 1 , 0)
 
     # Coordinates
@@ -209,7 +224,7 @@ def main():
     KH = False
     b=0
     d=0
-    c=0
+    c=1
     # Infinite while loop
     while True:
         # Event Handling loop
@@ -314,7 +329,7 @@ def main():
         # ROTATE
 
         if KI == True:
-            glRotate (5 , 0 , 0 , -1)
+            glRotate (5 , 0 , 1 , 0)
         if KK == True:
             glRotate (5 , 0 , 0 , 1)
         # Arm Angle
@@ -341,10 +356,10 @@ def main():
 
         glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glPushMatrix ()
-        Mirroir(a,b)
+        Mirroir(a,b,c)
         glPopMatrix ()
         glPushMatrix ()
-        support(c,d)
+        support(c)
         glPopMatrix ()
         support2()
         pygame.display.flip ()
