@@ -1,13 +1,20 @@
-
-from imgui.integrations.pygame import PygameRenderer
-import imgui
-
+from __future__ import absolute_import
+import OpenGL.GL as gl
 import pygame
 from pygame.locals import *
 from math import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
+import pywavefront
+from pywavefront import visualization
+from imgui.integrations.pygame import PygameRenderer
+import imgui
+
+# background = pygame.image.load ('back.jpg')
+obj = pywavefront.Wavefront ('Solar.obj')
+obj2 = pywavefront.Wavefront ('Solar.obj')
+
 colors = (
     (1 , 1 , 0) ,
     (2 , 1 , 0) ,
@@ -23,7 +30,8 @@ colors = (
     (0 , 1 , 1) ,
 )
 
-def Mirroir(a,b,c):
+
+def Mirroir(a , c):
     verticies = (
         (-2 , -1 , -0.1) ,
         (2 , -1 , -0.1) ,
@@ -56,24 +64,21 @@ def Mirroir(a,b,c):
         (6 , 7 , 3 , 0) ,
         (0 , 7 , 4 , 1) ,
         (6 , 5 , 2 , 3))
-#    x
-#    |
-#    |
-#    |
-#    |_ _ _ _ _ _ _z
-#   /
-#  /
-# /
-# y 
+    #    x
+    #    |
+    #    |
+    #    |
+    #    |_ _ _ _ _ _ _z
+    #   /
+    #  /
+    # /
+    # y 
 
+    glRotate (-a , 0 , 1 , 0)
+    ##glRotate (-b , 1 ,0 , 0)
+    glTranslatef (0 , 0 , 3)
+    glTranslatef (0 , -3 * (1 - cos (3.14 * c / 180)) , -3 * (1 - sin (3.14 * c / 180)))
 
-    
-    glRotate (-a , 0 , 1, 0)
-    glRotate (-b , 1 ,0 , 0)
-    glTranslatef (0, 0  , 3)
-    glTranslatef (0, -3*(1-cos(3.14*c/180))  , -3*(1-sin(3.14*c/180)))
-
-    
     glBegin (GL_QUADS)
     for surface in surfaces:
         x = 0
@@ -88,17 +93,30 @@ def Mirroir(a,b,c):
             glVertex3fv (verticies[vertex])
     glEnd ()
 
-def support(c):
+
+def mirroir2(a , c):
+    glRotate (-a , 0 , 1 , 0)
+
+    glTranslatef (0 , 0 , 3)
+    glTranslatef (0 , -3 * (1 - cos (3.14 * c / 180)) , -3 * (1 - sin (3.14 * c / 180)))
+    visualization.draw (obj)
+
+
+def house():
+    glTranslatef (0 , 0 , -7)
+    visualization.draw (obj2)
+
+
+def support(a , c):
     verticies1 = (
         (-0.1 , -3 , -0.1) ,
         (-0.1 , -3 , 0.1) ,
         (0.1 , -3 , 0.1) ,
-        (0.1 , -3 , -0.1),
+        (0.1 , -3 , -0.1) ,
         (-0.1 , 0 , -0.1) ,
         (-0.1 , 0 , 0.1) ,
         (0.1 , 0 , 0.1) ,
         (0.1 , 0 , -0.1) ,
-
 
     )
     edges1 = (
@@ -123,10 +141,11 @@ def support(c):
         (0 , 7 , 4 , 1) ,
         (6 , 5 , 2 , 3)
     )
-    glRotate (180 , 0, 0 , 1)
+    glRotate (180 , 0 , 0 , 1)
     glTranslatef (0 , 3 , 0)
-
-    glRotate (-c , 1 ,0 , 0)
+    glRotate (a , 0 , 1 , 0)
+    ##glRotate (-b , 1 ,0 , 0)
+    glRotate (-c , 1 , 0 , 0)
     glBegin (GL_QUADS)
     for surface in surfaces:
         x = 0
@@ -140,6 +159,8 @@ def support(c):
         for vertex in edge1:
             glVertex3fv (verticies1[vertex])
     glEnd ()
+
+
 def support2():
     verticies2 = (
         (-0.1 , -3 , -0.1) ,
@@ -190,14 +211,15 @@ def support2():
 
 
 def main():
-
-
     pygame.init ()
     display = (1000 , 700)
-    display_surface = pygame.display.set_mode (display , DOUBLEBUF | OPENGLBLIT)
+    screen = pygame.display.set_mode (display , DOUBLEBUF | OPENGLBLIT)
+    imgui.create_context ()
+    impl = PygameRenderer ()
+    io = imgui.get_io ()
+    io.display_size = display
     pygame.display.set_caption ('solar panels')
     gluPerspective (45 , (display[0] / display[1]) , 0.1 , 50.0)
-
     glTranslatef (0 , 0 , -10)
 
     glRotatef (25 , 2 , 1 , 0)
@@ -222,18 +244,13 @@ def main():
     KK = False
     KG = False
     KH = False
-    b=0
-    d=0
-    c=1
-    # Infinite while loop
-    while True:
-        # Event Handling loop
+    b = 0
+    d = 0
+    c = 1
+    while 1:
         for event in pygame.event.get ():
             if event.type == pygame.QUIT:
-                pygame.quit ()
-                quit ()
-            # Kill Window
-
+                sys.exit ()
             # KEYEVENT KEYDOWN HANDLING
             if event.type == pygame.KEYDOWN:
                 # TRANSLATE
@@ -315,16 +332,16 @@ def main():
 
         if KH == True:
             glTranslatef (0 , -1 , 0)
-            y += 5
+            y += 1
         if KG == True:
             glTranslatef (0 , 1 , 0)
-            y -= 5
+            y -= 1
         if KJ == True:
             glTranslatef (0 , 0 , -1)
-            z += 5
+            z += 1
         if KL == True:
             glTranslatef (0 , 0 , 1)
-            z -= 5
+            z -= 1
 
         # ROTATE
 
@@ -335,34 +352,67 @@ def main():
         # Arm Angle
         # Optional key usage to move arm model
         if KRIGHT == True:
-            a += 5
+            a += 1
 
         if KLEFT == True:
-            a -= 5
+            a -= 1
         if KUP == True:
-            b += 5
+            b += 1
 
         if KDOWN == True:
-            b -= 5
+            b -= 1
         if KA == True:
-            c += 5
+            c += 1
 
         if KD == True:
-            c -= 5
+            c -= 1
         if KW == True:
-            d += 5
+            d += 1
         if KS == True:
-            d -= 5
+            d -= 1
 
+        impl.process_event (event)
+        imgui.new_frame ()
+        imgui.begin ("Controle du Mirroir" , True)
+        imgui.text ("Les Angles")
+
+        c = imgui.slider_int ("Axe des x" , c , -180. , 180.)[1]
+        a = imgui.slider_int ("Axe des y" , a , -180. , 180.)[1]
+        changed , c = imgui.input_int ('Type coefficient:' , c)
+        imgui.text ('The Va;ue you entered is: %f' % c)
+        visible = True
+        expanded , visible = imgui.collapsing_header ("Expand me!" , visible)
+        if expanded:
+            imgui.text ("Now you see me qnd perhaps you don't !")
+            imgui.show_style_editor ()
+
+        imgui.end ()
+
+        imgui.render ()
+
+        gl.glClearColor (1 , 1 , 1 , 1)
         glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glPushMatrix ()
-        Mirroir(a,b,c)
-        glPopMatrix ()
-        glPushMatrix ()
-        support(c)
-        glPopMatrix ()
-        support2()
-        pygame.display.flip ()
-        pygame.time.wait (10)
+        impl.render (imgui.get_draw_data ())
 
-main ()
+        glPushMatrix ()
+        house ()
+        glPopMatrix ()
+        glPushMatrix ()
+        house ()
+        Mirroir (c , a)
+        glPopMatrix ()
+        glPushMatrix ()
+        mirroir2 (c , a)
+        glRotate (180 , 0 , 1 , 0)
+
+        glPopMatrix ()
+        glPushMatrix ()
+        support (c , a)
+        glPopMatrix ()
+        support2 ()
+
+        pygame.display.flip ()
+
+
+if __name__ == "__main__":
+    main ()
